@@ -60,14 +60,19 @@ namespace OCIO_NAMESPACE
         {
             // std::cout << "r" << in[0] << " g" << in[1] << " b" << in[2] << "\n";
             SamplerData *data = (SamplerData *)userdata;
-            cmsFloat32Number pix[3] = {static_cast<float>(in[0]) / 65535.f,
-                                       static_cast<float>(in[1]) / 65535.f,
-                                       static_cast<float>(in[2]) / 65535.f};
-            data->processor->applyRGB(pix);
-            out[0] = (cmsUInt16Number)std::max(std::min(pix[0] * 65535.f, 65535.f), 0.f);
-            out[1] = (cmsUInt16Number)std::max(std::min(pix[1] * 65535.f, 65535.f), 0.f);
-            out[2] = (cmsUInt16Number)std::max(std::min(pix[2] * 65535.f, 65535.f), 0.f);
-            cmsDoTransform(data->to_PCS16, out, out, 1);
+
+            // not needed methinks
+            // since this tool's icc capability was designed for
+            // photoshop which apparently does color correction this way around?
+            // cmsFloat32Number pix[3] = {static_cast<float>(in[0]) / 65535.f,
+            //                            static_cast<float>(in[1]) / 65535.f,
+            //                            static_cast<float>(in[2]) / 65535.f};
+            // data->processor->applyRGB(pix);
+            // out[0] = (cmsUInt16Number)std::max(std::min(pix[0] * 65535.f, 65535.f), 0.f);
+            // out[1] = (cmsUInt16Number)std::max(std::min(pix[1] * 65535.f, 65535.f), 0.f);
+            // out[2] = (cmsUInt16Number)std::max(std::min(pix[2] * 65535.f, 65535.f), 0.f);
+
+            cmsDoTransform(data->to_PCS16, in, out, 1);
             return 1;
         }
 
@@ -76,7 +81,15 @@ namespace OCIO_NAMESPACE
             // std::cout << "r" << in[0] << " g" << in[1] << " b" << in[2] << "\n";
             SamplerData *data = (SamplerData *)userdata;
             cmsDoTransform(data->from_PCS16, in, out, 1);
-            // we don't have a reverse Lab -> Display transform
+
+            cmsFloat32Number pix[3] = {static_cast<float>(out[0]) / 65535.f,
+                                       static_cast<float>(out[1]) / 65535.f,
+                                       static_cast<float>(out[2]) / 65535.f};
+            data->processor->applyRGB(pix);
+            out[0] = (cmsUInt16Number)std::max(std::min(pix[0] * 65535.f, 65535.f), 0.f);
+            out[1] = (cmsUInt16Number)std::max(std::min(pix[1] * 65535.f, 65535.f), 0.f);
+            out[2] = (cmsUInt16Number)std::max(std::min(pix[2] * 65535.f, 65535.f), 0.f);
+
             return 1;
         }
     } // anon namespace
