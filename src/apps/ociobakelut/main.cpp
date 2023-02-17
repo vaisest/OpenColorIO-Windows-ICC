@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright Contributors to the OpenColorIO Project.
 
-
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -15,12 +14,11 @@ namespace OCIO = OCIO_NAMESPACE;
 #include "apputils/argparse.h"
 #include "ocioicc.h"
 
-
 static std::string outputfile;
 
 static int parse_end_args(int argc, const char *argv[])
 {
-    if(argc>0)
+    if (argc > 0)
     {
         outputfile = argv[0];
     }
@@ -30,7 +28,7 @@ static int parse_end_args(int argc, const char *argv[])
 
 OCIO::GroupTransformRcPtr parse_luts(int argc, const char *argv[]);
 
-int main (int argc, const char* argv[])
+int main(int argc, const char *argv[])
 {
 
     bool help = false;
@@ -55,9 +53,10 @@ int main (int argc, const char* argv[])
     // What are the allowed baker output formats?
     std::ostringstream formats;
     formats << "the LUT format to bake: ";
-    for(int i=0; i<OCIO::Baker::getNumFormats(); ++i)
+    for (int i = 0; i < OCIO::Baker::getNumFormats(); ++i)
     {
-        if(i!=0) formats << ", ";
+        if (i != 0)
+            formats << ", ";
         formats << OCIO::Baker::getFormatNameByIndex(i);
         formats << " (." << OCIO::Baker::getFormatExtensionByIndex(i) << ")";
     }
@@ -108,9 +107,9 @@ int main (int argc, const char* argv[])
                "<SEPARATOR>", "ICC Options",
                //"--cubesize %d", &cubesize, "size of the ICC CLUT cube (default: 32)",
                "--whitepoint %d", &whitepointtemp, "whitepoint for the profile (default: 6505)",
-               "--displayicc %s", &displayicc , "an ICC profile which matches the OCIO profiles target display",
-               "--description %s", &description , "a meaningful description, this will show up in UI like photoshop (defaults to \"filename.icc\")",
-               "--copyright %s", &copyright , "a copyright field added in the file (default: \"No copyright. Use freely.\")\n",
+               "--displayicc %s", &displayicc, "an ICC profile which matches the OCIO profiles target display",
+               "--description %s", &description, "a meaningful description, this will show up in UI like photoshop (defaults to \"filename.icc\")",
+               "--copyright %s", &copyright, "a copyright field added in the file (default: \"No copyright. Use freely.\")\n",
                // TODO: add --metadata option
                NULL);
 
@@ -122,7 +121,7 @@ int main (int argc, const char* argv[])
         return 1;
     }
 
-    if (help || (argc == 1 ))
+    if (help || (argc == 1))
     {
         ap.usage();
         std::cout << "\n";
@@ -130,7 +129,7 @@ int main (int argc, const char* argv[])
     }
 
     // If we're printing to stdout, disable verbose printouts
-    if(usestdout)
+    if (usestdout)
     {
         verbose = false;
     }
@@ -144,20 +143,20 @@ int main (int argc, const char* argv[])
     {
         groupTransform = parse_luts(argc, argv);
     }
-    catch(const OCIO::Exception & e)
+    catch (const OCIO::Exception &e)
     {
         std::cerr << "\nERROR: " << e.what() << std::endl;
         std::cerr << "See --help for more info." << std::endl;
         return 1;
     }
-    catch(...)
+    catch (...)
     {
         std::cerr << "\nERROR: An unknown error occurred in parse_luts" << std::endl;
         std::cerr << "See --help for more info." << std::endl;
         return 1;
     }
 
-    if(!groupTransform)
+    if (!groupTransform)
     {
         std::cerr << "\nERROR: parse_luts returned null transform" << std::endl;
         std::cerr << "See --help for more info." << std::endl;
@@ -166,33 +165,33 @@ int main (int argc, const char* argv[])
 
     // If --luts have been specified, synthesize a new (temporary) configuration
     // with the transformation embedded in a colorspace.
-    if(groupTransform->getNumTransforms() > 0)
+    if (groupTransform->getNumTransforms() > 0)
     {
-        if(!inputspace.empty())
+        if (!inputspace.empty())
         {
             std::cerr << "\nERROR: --inputspace is not allowed when using --lut\n\n";
             std::cerr << "See --help for more info." << std::endl;
             return 1;
         }
-        if(!outputspace.empty())
+        if (!outputspace.empty())
         {
             std::cerr << "\nERROR: --outputspace is not allowed when using --lut\n\n";
             std::cerr << "See --help for more info." << std::endl;
             return 1;
         }
-        if(!looks.empty())
+        if (!looks.empty())
         {
             std::cerr << "\nERROR: --looks is not allowed when using --lut\n\n";
             std::cerr << "See --help for more info." << std::endl;
             return 1;
         }
-        if(!shaperspace.empty())
+        if (!shaperspace.empty())
         {
             std::cerr << "\nERROR: --shaperspace is not allowed when using --lut\n\n";
             std::cerr << "See --help for more info." << std::endl;
             return 1;
         }
-        if(!display.empty() || !view.empty())
+        if (!display.empty() || !view.empty())
         {
             std::cerr << "\nERROR: --displayview is not allowed when using --lut\n\n";
             std::cerr << "See --help for more info." << std::endl;
@@ -211,9 +210,9 @@ int main (int argc, const char* argv[])
         outputColorSpace->setName(outputspace.c_str());
 
         outputColorSpace->setTransform(groupTransform,
-            OCIO::COLORSPACE_DIR_FROM_REFERENCE);
+                                       OCIO::COLORSPACE_DIR_FROM_REFERENCE);
 
-        if(verbose)
+        if (verbose)
         {
             std::cout << "[OpenColorIO DEBUG]: Specified Transform:";
             std::cout << *groupTransform;
@@ -226,45 +225,45 @@ int main (int argc, const char* argv[])
     else
     {
 
-        if(inputspace.empty())
+        if (inputspace.empty())
         {
             std::cerr << "\nERROR: You must specify the --inputspace.\n\n";
             std::cerr << "See --help for more info." << std::endl;
             return 1;
         }
 
-        if(outputspace.empty() && (display.empty() && view.empty()))
+        if (outputspace.empty() && (display.empty() && view.empty()))
         {
             std::cerr << "\nERROR: You must specify either --outputspace or --displayview.\n\n";
             std::cerr << "See --help for more info." << std::endl;
             return 1;
         }
 
-        if(display.empty() ^ view.empty())
+        if (display.empty() ^ view.empty())
         {
             std::cerr << "\nERROR: You must specify both display and view with --displayview.\n\n";
             std::cerr << "See --help for more info." << std::endl;
             return 1;
         }
 
-        if(format.empty())
+        if (format.empty())
         {
             std::cerr << "\nERROR: You must specify the LUT format using --format.\n\n";
             std::cerr << "See --help for more info." << std::endl;
             return 1;
         }
 
-        if(!inputconfig.empty())
+        if (!inputconfig.empty())
         {
-            if(!usestdout && verbose)
+            if (!usestdout && verbose)
                 std::cout << "[OpenColorIO INFO]: Loading " << inputconfig << std::endl;
             config = OCIO::Config::CreateFromFile(inputconfig.c_str());
         }
-        else if(OCIO::GetEnvVariable("OCIO"))
+        else if (OCIO::GetEnvVariable("OCIO"))
         {
-            if(!usestdout && verbose)
+            if (!usestdout && verbose)
             {
-                std::cout << "[OpenColorIO INFO]: Loading $OCIO " 
+                std::cout << "[OpenColorIO INFO]: Loading $OCIO "
                           << OCIO::GetEnvVariable("OCIO") << std::endl;
             }
             config = OCIO::Config::CreateFromEnv();
@@ -273,12 +272,12 @@ int main (int argc, const char* argv[])
         {
             std::cerr << "ERROR: You must specify an input OCIO configuration ";
             std::cerr << "(either with --iconfig or $OCIO).\n\n";
-            ap.usage ();
+            ap.usage();
             return 1;
         }
     }
 
-    if(outputfile.empty() && !usestdout)
+    if (outputfile.empty() && !usestdout)
     {
         std::cerr << "\nERROR: You must specify the outputfile or --stdout.\n\n";
         std::cerr << "See --help for more info." << std::endl;
@@ -289,35 +288,36 @@ int main (int argc, const char* argv[])
     {
         // This could be moved to OCIO core by adding baking support for ICC
         // file format, here at the expense of adding the dependency to lcms2.
-        if(format == "icc")
+        if (format == "icc")
         {
-            if(description.empty())
+            if (description.empty())
             {
                 description = outputfile;
-                if(verbose)
+                if (verbose)
                     std::cout << "[OpenColorIO INFO]: \"--description\" set to default value of filename.icc: " << outputfile << "" << std::endl;
             }
 
-            if(usestdout)
+            if (usestdout)
             {
                 std::cerr << "\nERROR: --stdout not supported when writing ICC profiles.\n\n";
                 std::cerr << "See --help for more info." << std::endl;
                 return 1;
             }
 
-            if(outputfile.empty())
+            if (outputfile.empty())
             {
                 std::cerr << "ERROR: you need to specify a output ICC path\n";
                 std::cerr << "See --help for more info." << std::endl;
                 return 1;
             }
 
-            if(!shaperspace.empty())
+            if (!shaperspace.empty())
             {
                 std::cerr << "WARNING: shaperspace is ignored when generating ICC profiles.\n";
             }
 
-            if(cubesize<2) cubesize = 32; // default
+            if (cubesize < 2)
+                cubesize = 32; // default
 
             OCIO::ConstProcessorRcPtr processor;
             if (!display.empty() && !view.empty())
@@ -367,46 +367,48 @@ int main (int argc, const char* argv[])
             baker->setLooks(looks.c_str());
             baker->setTargetSpace(outputspace.c_str());
             baker->setDisplayView(display.c_str(), view.c_str());
-            if(shapersize!=-1) baker->setShaperSize(shapersize);
-            if(cubesize!=-1) baker->setCubeSize(cubesize);
+            if (shapersize != -1)
+                baker->setShaperSize(shapersize);
+            if (cubesize != -1)
+                baker->setCubeSize(cubesize);
 
             // output LUT
             std::ostringstream output;
 
-            if(!usestdout && verbose)
+            if (!usestdout && verbose)
                 std::cout << "[OpenColorIO INFO]: Baking '" << format << "' LUT" << std::endl;
 
-            if(usestdout)
+            if (usestdout)
             {
                 baker->bake(std::cout);
             }
             else
             {
                 std::ofstream f(outputfile.c_str());
-                if(f.fail())
+                if (f.fail())
                 {
                     std::cerr << "ERROR: Non-writable file path " << outputfile << " specified." << std::endl;
                     return 1;
                 }
                 baker->bake(f);
-                if(verbose)
+                if (verbose)
                     std::cout << "[OpenColorIO INFO]: Wrote '" << outputfile << "'" << std::endl;
             }
         }
     }
-    catch(OCIO::Exception & exception)
+    catch (OCIO::Exception &exception)
     {
         std::cerr << "OCIO Error: " << exception.what() << std::endl;
         std::cerr << "See --help for more info." << std::endl;
         return 1;
     }
-    catch (std::exception& exception)
+    catch (std::exception &exception)
     {
         std::cerr << "Error: " << exception.what() << "\n";
         std::cerr << "See --help for more info." << std::endl;
         return 1;
     }
-    catch(...)
+    catch (...)
     {
         std::cerr << "Unknown OCIO error encountered." << std::endl;
         std::cerr << "See --help for more info." << std::endl;
@@ -415,7 +417,6 @@ int main (int argc, const char* argv[])
 
     return 0;
 }
-
 
 // TODO: Replace this dirty argument parsing code with a clean version
 // that leverages the same codepath for the standard arguments.  If
@@ -435,19 +436,19 @@ OCIO::GroupTransformRcPtr parse_luts(int argc, const char *argv[])
                                   // returns a const object so we must set this
                                   // prior to using --lut for now.
 
-    for(int i=0; i<argc; ++i)
+    for (int i = 0; i < argc; ++i)
     {
         std::string arg(argv[i]);
 
-        if(arg == "--lut" || arg == "-lut")
+        if (arg == "--lut" || arg == "-lut")
         {
-            if(i+1>=argc)
+            if (i + 1 >= argc)
             {
                 throw OCIO::Exception("Error parsing --lut. Invalid num args");
             }
 
             OCIO::FileTransformRcPtr t = OCIO::FileTransform::Create();
-            t->setSrc(argv[i+1]);
+            t->setSrc(argv[i + 1]);
             t->setInterpolation(OCIO::INTERP_BEST);
             if (lastCCCId)
             {
@@ -457,35 +458,35 @@ OCIO::GroupTransformRcPtr parse_luts(int argc, const char *argv[])
 
             i += 1;
         }
-        else if(arg == "--cccid" || arg == "-cccid")
+        else if (arg == "--cccid" || arg == "-cccid")
         {
-            if(i+1>=argc)
+            if (i + 1 >= argc)
             {
                 throw OCIO::Exception("Error parsing --cccid. Invalid num args");
             }
 
-            lastCCCId = argv[i+1];
+            lastCCCId = argv[i + 1];
 
             i += 1;
         }
-        else if(arg == "--invlut" || arg == "-invlut")
+        else if (arg == "--invlut" || arg == "-invlut")
         {
-            if(i+1>=argc)
+            if (i + 1 >= argc)
             {
                 throw OCIO::Exception("Error parsing --invlut. Invalid num args");
             }
 
             OCIO::FileTransformRcPtr t = OCIO::FileTransform::Create();
-            t->setSrc(argv[i+1]);
+            t->setSrc(argv[i + 1]);
             t->setInterpolation(OCIO::INTERP_BEST);
             t->setDirection(OCIO::TRANSFORM_DIR_INVERSE);
             groupTransform->appendTransform(t);
 
             i += 1;
         }
-        else if(arg == "--slope" || arg == "-slope")
+        else if (arg == "--slope" || arg == "-slope")
         {
-            if(i+3>=argc)
+            if (i + 3 >= argc)
             {
                 throw OCIO::Exception("Error parsing --slope. Invalid num args");
             }
@@ -493,17 +494,17 @@ OCIO::GroupTransformRcPtr parse_luts(int argc, const char *argv[])
             OCIO::CDLTransformRcPtr t = OCIO::CDLTransform::Create();
 
             double scale[3];
-            scale[0] = atof(argv[i+1]);
-            scale[1] = atof(argv[i+2]);
-            scale[2] = atof(argv[i+3]);
+            scale[0] = atof(argv[i + 1]);
+            scale[1] = atof(argv[i + 2]);
+            scale[2] = atof(argv[i + 3]);
             t->setSlope(scale);
             groupTransform->appendTransform(t);
 
             i += 3;
         }
-        else if(arg == "--offset" || arg == "-offset")
+        else if (arg == "--offset" || arg == "-offset")
         {
-            if(i+3>=argc)
+            if (i + 3 >= argc)
             {
                 throw OCIO::Exception("Error parsing --offset. Invalid num args");
             }
@@ -511,17 +512,17 @@ OCIO::GroupTransformRcPtr parse_luts(int argc, const char *argv[])
             OCIO::CDLTransformRcPtr t = OCIO::CDLTransform::Create();
 
             double offset[3];
-            offset[0] = atof(argv[i+1]);
-            offset[1] = atof(argv[i+2]);
-            offset[2] = atof(argv[i+3]);
+            offset[0] = atof(argv[i + 1]);
+            offset[1] = atof(argv[i + 2]);
+            offset[2] = atof(argv[i + 3]);
             t->setOffset(offset);
             groupTransform->appendTransform(t);
 
             i += 3;
         }
-        else if(arg == "--offset10" || arg == "-offset10")
+        else if (arg == "--offset10" || arg == "-offset10")
         {
-            if(i+3>=argc)
+            if (i + 3 >= argc)
             {
                 throw OCIO::Exception("Error parsing --offset10. Invalid num args");
             }
@@ -529,16 +530,16 @@ OCIO::GroupTransformRcPtr parse_luts(int argc, const char *argv[])
             OCIO::CDLTransformRcPtr t = OCIO::CDLTransform::Create();
 
             double offset[3];
-            offset[0] = atof(argv[i+1]) / 1023.0;
-            offset[1] = atof(argv[i+2]) / 1023.0;
-            offset[2] = atof(argv[i+3]) / 1023.0;
+            offset[0] = atof(argv[i + 1]) / 1023.0;
+            offset[1] = atof(argv[i + 2]) / 1023.0;
+            offset[2] = atof(argv[i + 3]) / 1023.0;
             t->setOffset(offset);
             groupTransform->appendTransform(t);
             i += 3;
         }
-        else if(arg == "--power" || arg == "-power")
+        else if (arg == "--power" || arg == "-power")
         {
-            if(i+3>=argc)
+            if (i + 3 >= argc)
             {
                 throw OCIO::Exception("Error parsing --power. Invalid num args");
             }
@@ -546,23 +547,23 @@ OCIO::GroupTransformRcPtr parse_luts(int argc, const char *argv[])
             OCIO::CDLTransformRcPtr t = OCIO::CDLTransform::Create();
 
             double power[3];
-            power[0] = atof(argv[i+1]);
-            power[1] = atof(argv[i+2]);
-            power[2] = atof(argv[i+3]);
+            power[0] = atof(argv[i + 1]);
+            power[1] = atof(argv[i + 2]);
+            power[2] = atof(argv[i + 3]);
             t->setPower(power);
             groupTransform->appendTransform(t);
 
             i += 3;
         }
-        else if(arg == "--sat" || arg == "-sat")
+        else if (arg == "--sat" || arg == "-sat")
         {
-            if(i+1>=argc)
+            if (i + 1 >= argc)
             {
                 throw OCIO::Exception("Error parsing --sat. Invalid num args");
             }
 
             OCIO::CDLTransformRcPtr t = OCIO::CDLTransform::Create();
-            t->setSat(atof(argv[i+1]));
+            t->setSat(atof(argv[i + 1]));
             groupTransform->appendTransform(t);
 
             i += 1;
